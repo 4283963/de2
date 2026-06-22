@@ -1,0 +1,28 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-admin
+  datasource:
+    url: jdbc:postgresql://localhost:5432/iot_gateway?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  mqtt:
+    host-url: tcp://localhost:1883
+    client-id: gateway-core-admin
+    default-topic: sensors/+/data
+
+logging:
+  level:
+    com.iot.gateway: DEBUG
+    org.hibernate.SQL: DEBUG

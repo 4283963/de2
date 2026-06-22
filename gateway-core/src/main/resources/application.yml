@@ -1,0 +1,17 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: gateway-core
+  mqtt:
+    host-url: tcp://localhost:1883
+    client-id: gateway-core
+    default-topic: sensors/+/data
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+logging:
+  level:
+    com.iot.gateway: DEBUG
