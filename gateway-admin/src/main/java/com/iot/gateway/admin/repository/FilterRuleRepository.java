@@ -16,6 +16,8 @@ public interface FilterRuleRepository extends JpaRepository<FilterRule, Long> {
 
     Optional<FilterRule> findByRuleName(String ruleName);
 
+    List<FilterRule> findByEnabledTrue();
+
     List<FilterRule> findBySensorCodeAndEnabledTrue(String sensorCode);
 
     List<FilterRule> findByDeviceIdAndEnabledTrue(String deviceId);

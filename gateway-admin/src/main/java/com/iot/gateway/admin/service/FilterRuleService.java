@@ -6,6 +6,8 @@ import com.iot.gateway.admin.dto.PageResponse;
 import com.iot.gateway.admin.entity.FilterRule;
 import com.iot.gateway.admin.exception.ResourceNotFoundException;
 import com.iot.gateway.admin.repository.FilterRuleRepository;
+import com.iot.gateway.core.event.RuleCacheRefreshEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,8 +20,11 @@ public class FilterRuleService {
 
     private final FilterRuleRepository filterRuleRepository;
 
-    public FilterRuleService(FilterRuleRepository filterRuleRepository) {
+    private final ApplicationEventPublisher eventPublisher;
+
+    public FilterRuleService(FilterRuleRepository filterRuleRepository, ApplicationEventPublisher eventPublisher) {
         this.filterRuleRepository = filterRuleRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -27,6 +32,7 @@ public class FilterRuleService {
         FilterRule entity = new FilterRule();
         copyFromRequest(request, entity);
         FilterRule saved = filterRuleRepository.save(entity);
+        eventPublisher.publishEvent(new RuleCacheRefreshEvent(this, saved.getId(), RuleCacheRefreshEvent.Action.CREATE));
         return FilterRuleResponse.fromEntity(saved);
     }
 
@@ -51,6 +57,7 @@ public class FilterRuleService {
                 .orElseThrow(() -> new ResourceNotFoundException("FilterRule", "id", id));
         copyFromRequest(request, entity);
         FilterRule saved = filterRuleRepository.save(entity);
+        eventPublisher.publishEvent(new RuleCacheRefreshEvent(this, saved.getId(), RuleCacheRefreshEvent.Action.UPDATE));
         return FilterRuleResponse.fromEntity(saved);
     }
 
@@ -60,6 +67,7 @@ public class FilterRuleService {
             throw new ResourceNotFoundException("FilterRule", "id", id);
         }
         filterRuleRepository.deleteById(id);
+        eventPublisher.publishEvent(new RuleCacheRefreshEvent(this, id, RuleCacheRefreshEvent.Action.DELETE));
     }
 
     private void copyFromRequest(FilterRuleRequest request, FilterRule entity) {

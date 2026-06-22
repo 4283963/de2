@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -18,8 +19,11 @@ public class MqttMessageService {
 
     private final ObjectMapper objectMapper;
 
-    public MqttMessageService(ObjectMapper objectMapper) {
+    private final RuleEvaluationService ruleEvaluationService;
+
+    public MqttMessageService(ObjectMapper objectMapper, RuleEvaluationService ruleEvaluationService) {
         this.objectMapper = objectMapper;
+        this.ruleEvaluationService = ruleEvaluationService;
     }
 
     public Optional<SensorData> parseMessage(String topic, byte[] payload) {
@@ -66,6 +70,16 @@ public class MqttMessageService {
             if (data.getDeviceId() == null || data.getSensorCode() == null || data.getValue() == null) {
                 log.warn("Incomplete sensor data from topic {}: {}", topic, json);
                 return Optional.empty();
+            }
+
+            List<RuleEvaluationService.MatchedRule> matchedRules = ruleEvaluationService.evaluate(data);
+            if (!matchedRules.isEmpty()) {
+                log.info("Sensor data from topic {} triggered {} rule(s)", topic, matchedRules.size());
+                for (RuleEvaluationService.MatchedRule mr : matchedRules) {
+                    log.info("Triggered rule: id={}, name={}, actionType={}, actionTarget={}",
+                            mr.getRule().getId(), mr.getRule().getRuleName(),
+                            mr.getRule().getActionType(), mr.getRule().getActionTarget());
+                }
             }
 
             return Optional.of(data);
