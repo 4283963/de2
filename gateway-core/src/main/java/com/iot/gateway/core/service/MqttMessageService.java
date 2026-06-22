@@ -76,8 +76,13 @@ public class MqttMessageService {
             if (!matchedRules.isEmpty()) {
                 log.info("Sensor data from topic {} triggered {} rule(s)", topic, matchedRules.size());
                 for (RuleEvaluationService.MatchedRule mr : matchedRules) {
-                    log.info("Triggered rule: id={}, name={}, actionType={}, actionTarget={}",
-                            mr.getRule().getId(), mr.getRule().getRuleName(),
+                    String formula = mr.getRule().getTransformFormula();
+                    String formulaInfo = formula != null && !formula.isBlank()
+                            ? String.format(" (formula='%s', original=%s, transformed=%s)",
+                                    formula, mr.getSensorData().getValue(), mr.getTransformedValue())
+                            : String.format(" (value=%s)", mr.getSensorData().getValue());
+                    log.info("Triggered rule: id={}, name={}{}, actionType={}, actionTarget={}",
+                            mr.getRule().getId(), mr.getRule().getRuleName(), formulaInfo,
                             mr.getRule().getActionType(), mr.getRule().getActionTarget());
                 }
             }

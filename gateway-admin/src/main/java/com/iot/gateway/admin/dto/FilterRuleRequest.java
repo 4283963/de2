@@ -33,6 +33,9 @@ public class FilterRuleRequest {
     @Size(max = 256, message = "动作目标长度不能超过256个字符")
     private String actionTarget;
 
+    @Size(max = 512, message = "转换公式长度不能超过512个字符")
+    private String transformFormula;
+
     private Boolean enabled = true;
 
     public String getRuleName() {
@@ -97,6 +100,14 @@ public class FilterRuleRequest {
 
     public void setActionTarget(String actionTarget) {
         this.actionTarget = actionTarget;
+    }
+
+    public String getTransformFormula() {
+        return transformFormula;
+    }
+
+    public void setTransformFormula(String transformFormula) {
+        this.transformFormula = transformFormula;
     }
 
     public Boolean getEnabled() {

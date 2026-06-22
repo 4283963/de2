@@ -85,6 +85,7 @@ public class CachedRuleProvider implements RuleProvider {
         def.setThreshold(entity.getThreshold());
         def.setActionType(entity.getActionType());
         def.setActionTarget(entity.getActionTarget());
+        def.setTransformFormula(entity.getTransformFormula());
         def.setEnabled(Boolean.TRUE.equals(entity.getEnabled()));
         return def;
     }

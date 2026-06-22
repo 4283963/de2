@@ -79,6 +79,7 @@ public class FilterRuleService {
         entity.setThreshold(request.getThreshold());
         entity.setActionType(request.getActionType());
         entity.setActionTarget(request.getActionTarget());
+        entity.setTransformFormula(request.getTransformFormula());
         entity.setEnabled(request.getEnabled() != null ? request.getEnabled() : Boolean.TRUE);
     }
 }

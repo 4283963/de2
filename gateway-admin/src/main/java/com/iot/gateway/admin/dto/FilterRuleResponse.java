@@ -24,6 +24,8 @@ public class FilterRuleResponse {
 
     private String actionTarget;
 
+    private String transformFormula;
+
     private Boolean enabled;
 
     private LocalDateTime createdAt;
@@ -41,6 +43,7 @@ public class FilterRuleResponse {
         resp.setThreshold(entity.getThreshold());
         resp.setActionType(entity.getActionType());
         resp.setActionTarget(entity.getActionTarget());
+        resp.setTransformFormula(entity.getTransformFormula());
         resp.setEnabled(entity.getEnabled());
         resp.setCreatedAt(entity.getCreatedAt());
         resp.setUpdatedAt(entity.getUpdatedAt());
@@ -117,6 +120,14 @@ public class FilterRuleResponse {
 
     public void setActionTarget(String actionTarget) {
         this.actionTarget = actionTarget;
+    }
+
+    public String getTransformFormula() {
+        return transformFormula;
+    }
+
+    public void setTransformFormula(String transformFormula) {
+        this.transformFormula = transformFormula;
     }
 
     public Boolean getEnabled() {

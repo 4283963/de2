@@ -17,8 +17,11 @@ public class RuleEvaluationService {
 
     private final RuleProvider ruleProvider;
 
-    public RuleEvaluationService(RuleProvider ruleProvider) {
+    private final FormulaEvaluator formulaEvaluator;
+
+    public RuleEvaluationService(RuleProvider ruleProvider, FormulaEvaluator formulaEvaluator) {
         this.ruleProvider = ruleProvider;
+        this.formulaEvaluator = formulaEvaluator;
     }
 
     public List<MatchedRule> evaluate(SensorData sensorData) {
@@ -26,13 +29,15 @@ public class RuleEvaluationService {
         List<MatchedRule> matched = new ArrayList<>();
 
         for (FilterRuleDefinition rule : activeRules) {
-            if (matches(rule, sensorData)) {
-                log.info("Rule matched: ruleId={}, ruleName='{}', deviceId={}, sensorCode={}, value={}, operator={}, threshold={}",
+            double effectiveValue = formulaEvaluator.evaluate(rule.getTransformFormula(), sensorData.getValue());
+
+            if (matches(rule, sensorData, effectiveValue)) {
+                log.info("Rule matched: ruleId={}, ruleName='{}', deviceId={}, sensorCode={}, originalValue={}, transformedValue={}, operator={}, threshold={}",
                         rule.getId(), rule.getRuleName(), sensorData.getDeviceId(),
-                        sensorData.getSensorCode(), sensorData.getValue(),
+                        sensorData.getSensorCode(), sensorData.getValue(), effectiveValue,
                         rule.getOperator(), rule.getThreshold());
 
-                matched.add(new MatchedRule(rule, sensorData));
+                matched.add(new MatchedRule(rule, sensorData, effectiveValue));
             }
         }
 
@@ -44,14 +49,14 @@ public class RuleEvaluationService {
         return matched;
     }
 
-    private boolean matches(FilterRuleDefinition rule, SensorData data) {
+    private boolean matches(FilterRuleDefinition rule, SensorData data, double effectiveValue) {
         if (rule.getDeviceId() != null && !rule.getDeviceId().equals(data.getDeviceId())) {
             return false;
         }
         if (!rule.getSensorCode().equals(data.getSensorCode())) {
             return false;
         }
-        return rule.getOperator().evaluate(data.getValue(), rule.getThreshold());
+        return rule.getOperator().evaluate(effectiveValue, rule.getThreshold());
     }
 
     public static class MatchedRule {
@@ -60,9 +65,12 @@ public class RuleEvaluationService {
 
         private final SensorData sensorData;
 
-        public MatchedRule(FilterRuleDefinition rule, SensorData sensorData) {
+        private final double transformedValue;
+
+        public MatchedRule(FilterRuleDefinition rule, SensorData sensorData, double transformedValue) {
             this.rule = rule;
             this.sensorData = sensorData;
+            this.transformedValue = transformedValue;
         }
 
         public FilterRuleDefinition getRule() {
@@ -71,6 +79,10 @@ public class RuleEvaluationService {
 
         public SensorData getSensorData() {
             return sensorData;
+        }
+
+        public double getTransformedValue() {
+            return transformedValue;
         }
     }
 }

@@ -41,6 +41,9 @@ public class FilterRule {
     @Column(name = "action_target", length = 256)
     private String actionTarget;
 
+    @Column(name = "transform_formula", length = 512)
+    private String transformFormula;
+
     @Column(name = "enabled", nullable = false)
     private Boolean enabled = true;
 
@@ -131,6 +134,14 @@ public class FilterRule {
 
     public void setActionTarget(String actionTarget) {
         this.actionTarget = actionTarget;
+    }
+
+    public String getTransformFormula() {
+        return transformFormula;
+    }
+
+    public void setTransformFormula(String transformFormula) {
+        this.transformFormula = transformFormula;
     }
 
     public Boolean getEnabled() {

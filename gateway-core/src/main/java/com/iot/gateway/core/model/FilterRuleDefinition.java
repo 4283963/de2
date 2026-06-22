@@ -20,6 +20,8 @@ public class FilterRuleDefinition {
 
     private String actionTarget;
 
+    private String transformFormula;
+
     private boolean enabled;
 
     public enum Operator {
@@ -115,6 +117,14 @@ public class FilterRuleDefinition {
 
     public void setActionTarget(String actionTarget) {
         this.actionTarget = actionTarget;
+    }
+
+    public String getTransformFormula() {
+        return transformFormula;
+    }
+
+    public void setTransformFormula(String transformFormula) {
+        this.transformFormula = transformFormula;
     }
 
     public boolean isEnabled() {
